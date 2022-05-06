@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Exercício 02 - Projeto Computacional PE</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/styles/stackoverflow-dark.min.css"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/highlight.min.js"></script>
+    <script>
+      hljs.highlightAll();
+    </script>
+    <style>
+      html {
+        font-family: sans-serif;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      body {
+        margin: 0;
+      }
+      header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 0.8em;
+      }
+      header > p {
+        flex-grow: 1;
+        text-align: center;
+      }
+      header > p:first-child {
+        text-align: left;
+      }
+      header > p:last-child {
+        text-align: right;
+      }
+      pre {
+        margin-top: 0;
+        font-size: 0.9em;
+      }
+      pre code.hljs {
+        border-radius: 1em;
+        padding: 0 1em;
+      }
+      .side-by-side {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+      }
+      .side-by-side img {
+        max-width: 50%;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <p>Diogo Correia - 99211</p>
+      <p>Projeto Computacional - Probabilidade e Estatística</p>
+      <p>Pergunta 2</p>
+    </header>
+    <pre>
+      <code class="language-r">
+library("openxlsx")
+library("ggplot2")
+library("stringr")
+library("tidyr")
+library("dplyr")
+
+df <- read.xlsx(xlsxFile = "EsperancaVida.xlsx", sheet = 1, rows = c(9:70))
+names(df)[1] <- "year"
+names(df) <- str_replace_all(names(df), "\\.", " ")
+names(df)[2:35] <- paste(names(df)[2:35], c(" (Total)"))
+names(df)[36:69] <- paste(names(df)[36:69], c(" (Homens)"))
+names(df)[70:103] <- paste(names(df)[70:103], c(" (Mulheres)"))
+
+df <- df[c(1, 36:103)] %>%
+  {pivot_longer(., all_of(names(.)[2:69]), names_to = "country", values_to = "esp_vida")} %>%
+  transform(country_code = str_replace(country, " - .+", "")) %>%
+  transform(type = str_match(country, "\\((\\w+)\\)$")) %>%
+  transform(country_dn = str_replace(country, "\\((\\w+)\\)$", ""))
+
+df[df$`country_code` %in% c("NL", "LU", "DE"), ] %>%
+  filter(year >= 2002 & year <= 2019) %>%
+  transform(esp_vida = ifelse(esp_vida == 0, NA, esp_vida)) %>%
+  na.omit() %>%
+  ggplot(aes(x = year, y = esp_vida, color = country_dn, shape = `type.2`)) +
+  geom_line(na.rm = TRUE) +
+  geom_point(size = 1.2, na.rm = TRUE) +
+  scale_color_brewer(palette = "Dark2") +
+  xlab("Ano") +
+  ylab("Esperança Média de Vida (Anos)") +
+  labs(color = "País", shape = "Género", subtitle = "na Alemanha, Luxemburgo e Países Baixos") +
+  ggtitle("Esperança Média de Vida (Anos) entre 2002 e 2019, por Género,") +
+  ylim(73, 85)
+      </code>
+    </pre>
+    <img src="./output.svg" />
+    <div>
+      <p>
+        Pelo gráfico temporal obtido, há uma clara distinção entre a esperança
+        média de vida entre géneros: as mulheres têm valores superiores nos 3
+        países analizados.
+      </p>
+      <p>
+        Reparamos também é que a tendência é crescente, isto é, a esperança
+        média de vida aumenta ao longo do tempo.
+      </p>
+      <p>
+        Entre países, no mesmo género, há pouca diferença no valor da esperança
+        média de vida: nos homens, a Alemanha tem um valor inferior tanto ao
+        Luxemburgo como aos Países baixos; nas mulheres, o Luxemburgo tem um
+        valor superior tanto à Alemanha como aos Países Baixos.
+      </p>
+    </div>
+  </body>
+</html>

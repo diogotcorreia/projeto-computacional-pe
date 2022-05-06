@@ -1,0 +1,4 @@
+# Exercício 02
+
+Os dados no ficheiro `EsperancaVida.xlsx` correspondem aos valores da esperança de vida à nascença (total e por sexo) em **31** países europeus, entre 1960 e 2020.
+Com recurso à função `ggplot` represente, num mesmo gráfico temporal, as séries dos valores da esperança de vida à nascença das mulheres e dos homens, entre 2002 e 2019, nos países **NL - Paises Baixos**, **LU - Luxemburgo** e **DE - Alemanha**.
