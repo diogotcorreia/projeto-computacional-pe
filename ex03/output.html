@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Exercício 03 - Projeto Computacional PE</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/styles/stackoverflow-dark.min.css"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/highlight.min.js"></script>
+    <script>
+      hljs.highlightAll();
+    </script>
+    <style>
+      html {
+        font-family: sans-serif;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      body {
+        margin: 0;
+      }
+      header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 0.8em;
+      }
+      header > p {
+        flex-grow: 1;
+        text-align: center;
+      }
+      header > p:first-child {
+        text-align: left;
+      }
+      header > p:last-child {
+        text-align: right;
+      }
+      pre {
+        margin-top: 0;
+        font-size: 0.9em;
+      }
+      pre code.hljs {
+        border-radius: 1em;
+        padding: 0 1em;
+      }
+      .side-by-side {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+      }
+      .side-by-side img {
+        max-width: 50%;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <p>Diogo Correia - 99211</p>
+      <p>Projeto Computacional - Probabilidade e Estatística</p>
+      <p>Pergunta 3</p>
+    </header>
+    <pre>
+      <code class="language-r">
+library("openxlsx")
+library("dplyr")
+library("tidyr")
+library("ggplot2")
+
+df <- read.xlsx(xlsxFile = "QualidadeARO3.xlsx", sheet = 1) %>%
+  type.convert(as.is = TRUE) %>%
+  pivot_longer(names(.), names_to = "station", values_to = "o3_level") %>%
+  filter(station %in% c("Sobreiras-Porto", "Restelo"))
+
+df %>%
+  ggplot(aes(x = o3_level, fill = station)) +
+  geom_histogram(position = "identity", colour = "black", alpha = 0.5) +
+  scale_fill_brewer(palette = "Dark2") +
+  xlab("Densidade de Ozono (µg/m³)") +
+  ylab("Número de Leituras") +
+  labs(fill = "Estação da Rede QUALAR", subtitle = "no Restelo e em Sobreiras-Porto") +
+  ggtitle("Observações Horárias dos Níveis de Ozono (O3), em 2020,")
+      </code>
+    </pre>
+    <img src="./output.svg" />
+    <div>
+      <p>
+        Em Sobreiras-Porto registou-se uma maior variância dos níveis de ozono,
+        em relação às leituras no Restelo.
+      </p>
+      <p>
+        Ambas as estações apresentam o centro da distribuição perto de 50 µg/m³.
+      </p>
+    </div>
+  </body>
+</html>
