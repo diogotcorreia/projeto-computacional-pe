@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Exercício 09 - Projeto Computacional PE</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/styles/stackoverflow-dark.min.css"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/highlight.min.js"></script>
+    <script>
+      hljs.highlightAll();
+    </script>
+    <style>
+      html {
+        font-family: sans-serif;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      body {
+        margin: 0;
+      }
+      header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 0.8em;
+      }
+      header > p {
+        flex-grow: 1;
+        text-align: center;
+      }
+      header > p:first-child {
+        text-align: left;
+      }
+      header > p:last-child {
+        text-align: right;
+      }
+      pre {
+        margin-top: 0;
+        font-size: 0.9em;
+      }
+      pre code.hljs {
+        border-radius: 1em;
+        padding: 0 1em;
+      }
+      .side-by-side {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+      }
+      .side-by-side img {
+        max-width: 65%;
+        margin-right: 1em;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <p>Diogo Correia - 99211</p>
+      <p>Projeto Computacional - Probabilidade e Estatística</p>
+      <p>Pergunta 9</p>
+    </header>
+    <pre>
+      <code class="language-r">
+library("Rmisc")
+library("ggplot2")
+
+SEED <- 992
+M <- 900
+LAMBDA <- 0.98
+CONF_LEVEL <- 0.93
+
+set.seed(SEED)
+
+df <- data.frame()
+for (n in seq(from = 100, to = 5000, by = 100)) {
+  amplitude <- c()
+  for (i in 1:M) {
+    samples <- rexp(n, rate = LAMBDA)
+    conf_interval <- CI(samples, ci = CONF_LEVEL)
+    amplitude <- append(amplitude,
+      c(abs(conf_interval[["upper"]] - conf_interval[["lower"]])))
+  }
+  mean_amplitude <- mean(amplitude)
+
+  df <- rbind(df, data.frame(n = n, amplitude = mean_amplitude))
+}
+
+ggplot(df, aes(x = n, y = amplitude)) +
+  geom_line(color = "#fb8500") +
+  geom_point(color = "#fb8500") +
+  xlab("Dimensão da Amostra") +
+  ylab("Amplitude do Intervalo de Confiança") +
+  labs(title = "Relação entre Amplitude do Intervalo de Confiança e Dimensão da Amostra",
+    subtitle = sprintf("semente = %d | m = %d | λ = %.2f | (1 - α) = %.2f",
+      SEED, M, LAMBDA, CONF_LEVEL))
+      </code>
+    </pre>
+    <div class="side-by-side">
+      <img src="./output.svg" />
+      <div>
+        <p>
+          Através do gráfico obtido, conseguimos concluir que quanto maior a
+          dimensão da amostra menor será a amplitude do intervalo de confiança.
+          A relação entre estas duas variáveis é logarítmica.
+        </p>
+      </div>
+    </div>
+  </body>
+</html>
