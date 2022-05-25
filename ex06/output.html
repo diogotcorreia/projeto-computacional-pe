@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Exercício 06 - Projeto Computacional PE</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/styles/stackoverflow-dark.min.css"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/highlight.min.js"></script>
+    <script>
+      hljs.highlightAll();
+    </script>
+    <style>
+      html {
+        font-family: sans-serif;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      body {
+        margin: 0;
+      }
+      header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 0.8em;
+      }
+      header > p {
+        flex-grow: 1;
+        text-align: center;
+      }
+      header > p:first-child {
+        text-align: left;
+      }
+      header > p:last-child {
+        text-align: right;
+      }
+      pre {
+        margin-top: 0;
+        font-size: 0.7em;
+      }
+      pre code.hljs {
+        border-radius: 1em;
+        padding: 0 1em;
+      }
+      .side-by-side {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+      }
+      .side-by-side img {
+        max-width: 65%;
+        margin-right: 1em;
+      }
+    </style>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/katex.min.css"
+      integrity="sha384-ZPe7yZ91iWxYumsBEOn7ieg8q/o+qh/hQpSaPow8T6BwALcXSCS6C6fSRPIAnTQs"
+      crossorigin="anonymous"
+    />
+
+    <!-- The loading of KaTeX is deferred to speed up page rendering -->
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/katex.min.js"
+      integrity="sha384-ljao5I1l+8KYFXG7LNEA7DyaFvuvSCmedUf6Y6JI7LJqiu8q5dEivP2nDdFH31V4"
+      crossorigin="anonymous"
+    ></script>
+
+    <!-- To automatically render math in text elements, include the auto-render extension: -->
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/contrib/auto-render.min.js"
+      integrity="sha384-+XBljXPPiv+OzfbB3cVmLHf4hdUFHlWNZN5spNQ7rmHTXpd7WvJum6fIACpNNfIR"
+      crossorigin="anonymous"
+      onload="renderMathInElement(document.body);"
+    ></script>
+  </head>
+  <body>
+    <header>
+      <p>Diogo Correia - 99211</p>
+      <p>Projeto Computacional - Probabilidade e Estatística</p>
+      <p>Pergunta 6</p>
+    </header>
+    <pre>
+      <code class="language-r">
+library("dplyr")
+library("ggplot2")
+library("gridExtra")
+library("latex2exp")
+
+SEED <- 1771
+N <- c(2, 29, 73)
+MIN <- 10
+MAX <- 14
+SAMPLES <- 950
+
+df <- data.frame(i = c(), value = c())
+
+for (n in N) {
+  set.seed(SEED)
+  col <- c()
+  for (i in 1:SAMPLES) {
+    sample <- runif(n, min = MIN, max = MAX) %>%
+      mean()
+    df <- df %>%
+      rbind(data.frame(i = n, value = sample))
+  }
+}
+
+plots <- list()
+for (n in N) {
+  df_filtered <- df %>%
+    filter(i == n)
+  var <- ((1 / 12) * (MAX - MIN)^2) / n
+  plot <- df_filtered %>%
+    ggplot(aes(x = value)) +
+      geom_histogram(aes(y = ..density..), colour = "black", fill = "#f4a261",
+        binwidth = 0.1) +
+      stat_function(fun = dnorm, args = list(mean = mean(c(MIN, MAX)), sd = sqrt(var))) +
+      xlim(c(MIN, MAX)) +
+      labs(subtitle = TeX(sprintf(paste("seed = %d",
+            "$n$ = %d",
+            "distribuição uniforme contínua no intervalo $\\[%d, %d\\]$",
+            "%d amostras", sep = " | "), SEED, n, MIN, MAX, SAMPLES))) +
+      xlab(TeX("Média $\\bar{X}_n$")) +
+      ylab("Densidade")
+
+  plots <- plots %>% append(list(plot))
+}
+
+do.call(grid.arrange, plots)
+      </code>
+    </pre>
+    <div class="side-by-side">
+      <img src="./output.svg" />
+      <div>
+        <p>
+          Através dos três histogramas obtidos, podemos concluir que para maior
+          quantidade de valores na distribuição uniforme (isto é, \(n\)), o
+          valor da média obtido empiricamente se aproxima do valor esperado
+          (neste caso, 12).<br />
+          Por outras palavras, quanto maior o valor de n, menor será o desvio
+          padrão da distribuição da média \(\overline{X}n\).
+        </p>
+      </div>
+    </div>
+  </body>
+</html>
