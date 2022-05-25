@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Exercício 10 - Projeto Computacional PE</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/styles/stackoverflow-dark.min.css"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/highlight.min.js"></script>
+    <script>
+      hljs.highlightAll();
+    </script>
+    <style>
+      html {
+        font-family: sans-serif;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      body {
+        margin: 0;
+      }
+      header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 0.8em;
+      }
+      header > p {
+        flex-grow: 1;
+        text-align: center;
+      }
+      header > p:first-child {
+        text-align: left;
+      }
+      header > p:last-child {
+        text-align: right;
+      }
+      pre {
+        margin-top: 0;
+        font-size: 0.7em;
+      }
+      pre code.hljs {
+        border-radius: 1em;
+        padding: 0 1em;
+      }
+      .side-by-side {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+      }
+      .side-by-side img {
+        max-width: 64%;
+        margin-right: 1em;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <p>Diogo Correia - 99211</p>
+      <p>Projeto Computacional - Probabilidade e Estatística</p>
+      <p>Pergunta 10</p>
+    </header>
+    <pre>
+      <code class="language-r">
+library("Rmisc")
+library("ggplot2")
+
+SEED <- 346
+M <- 1100
+LAMBDA <- 0.45
+LAMBDA_OUTLIERS <- 0.01
+PERCENT_CONTAMINATED <- 0.20
+CONF_LEVEL <- 0.999
+set.seed(SEED)
+
+df <- data.frame()
+for (n in seq(from = 100, to = 5000, by = 100)) {
+  n_contaminated <- floor(n * PERCENT_CONTAMINATED)
+  amplitude <- c()
+  amplitude_contaminated <- c()
+  for (i in 1:M) {
+    samples <- rexp(n, rate = LAMBDA)
+    samples_outliers <- rexp(n_contaminated, rate = LAMBDA_OUTLIERS)
+    samples_contaminated <- c(samples_outliers[0:n_contaminated],
+                              samples[n_contaminated:length(samples)])
+    conf_interval <- CI(samples, ci = CONF_LEVEL)
+    conf_interval_contaminated <- CI(samples_contaminated, ci = CONF_LEVEL)
+    amplitude <- append(amplitude,
+      c(abs(conf_interval[["upper"]] - conf_interval[["lower"]])))
+    amplitude_contaminated <- append(amplitude_contaminated,
+      c(abs(conf_interval_contaminated[["upper"]]
+              - conf_interval_contaminated[["lower"]])))
+  }
+  mean_amplitude <- mean(amplitude)
+  mean_amplitude_contaminated <- mean(amplitude_contaminated)
+
+  df <- rbind(df, data.frame(n = c(n, n),
+        amplitude = c(mean_amplitude, mean_amplitude_contaminated),
+        type = c("Não Contaminado", "Contaminado")
+  ))
+}
+
+ggplot(df, aes(x = n, y = amplitude, color = type)) +
+  geom_line() +
+  geom_point() +
+  scale_color_brewer(palette = "Dark2") +
+  xlab("Dimensão da Amostra") +
+  ylab("Amplitude do Intervalo de Confiança") +
+  labs(title = "Relação entre Amplitude do Intervalo de Confiança e Dimensão da Amostra",
+    color = "Tipo de Amostra",
+    subtitle = sprintf("semente = %d | m = %d | λ = %.2f | λc = %.2f | ϵ = %.0f%% | (1 - α) = %.3f",
+      SEED, M, LAMBDA, LAMBDA_OUTLIERS, PERCENT_CONTAMINATED * 100, CONF_LEVEL))
+      </code>
+    </pre>
+    <div class="side-by-side">
+      <img src="./output.svg" />
+      <div>
+        <p>
+          Através do gráfico obtido, conseguimos concluir que quanto maior a
+          dimensão da amostra menor será a amplitude do intervalo de confiança.
+          A relação entre estas duas variáveis é inversamente proporcional.
+        </p>
+        <p>
+          Podemos também analisar consoante o tipo da amostra: as amostras
+          contaminadas apresentam uma amplitude do intervalo de confiança muito
+          maior do que as amostras não contaminadas, especialmente para
+          dimensões mais pequenas.
+        </p>
+      </div>
+    </div>
+  </body>
+</html>
