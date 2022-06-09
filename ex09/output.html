@@ -40,7 +40,7 @@
       }
       pre {
         margin-top: 0;
-        font-size: 0.9em;
+        font-size: 0.8em;
       }
       pre code.hljs {
         border-radius: 1em;
@@ -65,7 +65,6 @@
     </header>
     <pre>
       <code class="language-r">
-library("Rmisc")
 library("ggplot2")
 
 SEED <- 992
@@ -75,14 +74,20 @@ CONF_LEVEL <- 0.93
 
 set.seed(SEED)
 
+conf_interval_amplitude <- function(samples, conf_level) {
+  len <- length(samples)
+  upper <- ((1 + qnorm(1 - (1 - conf_level) / 2) / sqrt(len)) / mean(samples))
+  lower <- ((1 - qnorm(1 - (1 - conf_level) / 2) / sqrt(len)) / mean(samples))
+  return(abs(upper - lower))
+}
+
 df <- data.frame()
 for (n in seq(from = 100, to = 5000, by = 100)) {
   amplitude <- c()
   for (i in 1:M) {
     samples <- rexp(n, rate = LAMBDA)
-    conf_interval <- CI(samples, ci = CONF_LEVEL)
-    amplitude <- append(amplitude,
-      c(abs(conf_interval[["upper"]] - conf_interval[["lower"]])))
+    new_amplitude <- conf_interval_amplitude(samples, CONF_LEVEL)
+    amplitude <- append(amplitude, new_amplitude)
   }
   mean_amplitude <- mean(amplitude)
 
