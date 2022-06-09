@@ -93,16 +93,16 @@ df[df$`country_code` %in% c("NL", "LU", "DE"), ] %>%
   scale_color_brewer(palette = "Dark2") +
   xlab("Ano") +
   ylab("Esperança Média de Vida (Anos)") +
-  labs(color = "País", shape = "Género", subtitle = "na Alemanha, Luxemburgo e Países Baixos") +
-  ggtitle("Esperança Média de Vida (Anos) entre 2002 e 2019, por Género,") +
-  ylim(73, 85)
+  labs(color = "País", shape = "Sexo", subtitle = "na Alemanha, Luxemburgo e Países Baixos") +
+  ggtitle("Esperança Média de Vida (Anos) entre 2002 e 2019, por sexo,") +
+  ylim(73, 86)
       </code>
     </pre>
     <img src="./output.svg" />
     <div>
       <p>
         Pelo gráfico temporal obtido, há uma clara distinção entre a esperança
-        média de vida entre géneros: as mulheres têm valores superiores nos 3
+        média de vida entre sexos: as mulheres têm valores superiores nos 3
         países analizados.
       </p>
       <p>
@@ -111,9 +111,10 @@ df[df$`country_code` %in% c("NL", "LU", "DE"), ] %>%
       </p>
       <p>
         Entre países, no mesmo género, há pouca diferença no valor da esperança
-        média de vida: nos homens, a Alemanha tem um valor inferior tanto ao
-        Luxemburgo como aos Países baixos; nas mulheres, o Luxemburgo tem um
-        valor superior tanto à Alemanha como aos Países Baixos.
+        média de vida: nos homens, a Alemanha tem um valor ligeiramente inferior
+        tanto ao Luxemburgo como aos Países baixos; nas mulheres, o Luxemburgo
+        tem um valor ligeiramente superior tanto à Alemanha como aos Países
+        Baixos.
       </p>
     </div>
   </body>
