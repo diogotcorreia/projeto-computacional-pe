@@ -40,7 +40,7 @@
       }
       pre {
         margin-top: 0;
-        font-size: 0.7em;
+        font-size: 0.62em;
       }
       pre code.hljs {
         border-radius: 1em;
@@ -65,7 +65,6 @@
     </header>
     <pre>
       <code class="language-r">
-library("Rmisc")
 library("ggplot2")
 
 SEED <- 346
@@ -76,6 +75,12 @@ PERCENT_CONTAMINATED <- 0.20
 CONF_LEVEL <- 0.999
 set.seed(SEED)
 
+conf_interval_amplitude <- function(samples, conf_level) {
+  len <- length(samples)
+  upper <- ((1 + qnorm(1 - (1 - conf_level) / 2) / sqrt(len)) / mean(samples))
+  lower <- ((1 - qnorm(1 - (1 - conf_level) / 2) / sqrt(len)) / mean(samples))
+  return(abs(upper - lower))
+}
 df <- data.frame()
 for (n in seq(from = 100, to = 5000, by = 100)) {
   n_contaminated <- floor(n * PERCENT_CONTAMINATED)
@@ -84,15 +89,12 @@ for (n in seq(from = 100, to = 5000, by = 100)) {
   for (i in 1:M) {
     samples <- rexp(n, rate = LAMBDA)
     samples_outliers <- rexp(n_contaminated, rate = LAMBDA_OUTLIERS)
-    samples_contaminated <- c(samples_outliers[0:n_contaminated],
-                              samples[n_contaminated:length(samples)])
-    conf_interval <- CI(samples, ci = CONF_LEVEL)
-    conf_interval_contaminated <- CI(samples_contaminated, ci = CONF_LEVEL)
-    amplitude <- append(amplitude,
-      c(abs(conf_interval[["upper"]] - conf_interval[["lower"]])))
-    amplitude_contaminated <- append(amplitude_contaminated,
-      c(abs(conf_interval_contaminated[["upper"]]
-              - conf_interval_contaminated[["lower"]])))
+    samples_contaminated <- c(samples_outliers[1:n_contaminated],
+                              samples[(n_contaminated + 1):length(samples)])
+    new_amplitude <- conf_interval_amplitude(samples, CONF_LEVEL)
+    new_amplitude_contaminated <- conf_interval_amplitude(samples_contaminated, CONF_LEVEL)
+    amplitude <- append(amplitude, new_amplitude)
+    amplitude_contaminated <- append(amplitude_contaminated, new_amplitude_contaminated)
   }
   mean_amplitude <- mean(amplitude)
   mean_amplitude_contaminated <- mean(amplitude_contaminated)
@@ -124,10 +126,10 @@ ggplot(df, aes(x = n, y = amplitude, color = type)) +
           A relação entre estas duas variáveis é inversamente proporcional.
         </p>
         <p>
-          Podemos também analisar consoante o tipo da amostra: as amostras
+          Podemos também analisar consoante o tipo da amostra: as amostras não
           contaminadas apresentam uma amplitude do intervalo de confiança muito
-          maior do que as amostras não contaminadas, especialmente para
-          dimensões mais pequenas.
+          maior do que as amostras contaminadas, especialmente para dimensões
+          mais pequenas.
         </p>
       </div>
     </div>
