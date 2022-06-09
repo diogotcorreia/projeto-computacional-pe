@@ -119,7 +119,7 @@ for (n in N) {
   var <- ((1 / 12) * (MAX - MIN)^2) / n
   plot <- df_filtered %>%
     ggplot(aes(x = value)) +
-      geom_histogram(aes(y = ..density..), colour = "black", fill = "#f4a261",
+      geom_histogram(aes(y = ..count../sum(..count..)), colour = "black", fill = "#f4a261",
         binwidth = 0.1) +
       stat_function(fun = dnorm, args = list(mean = mean(c(MIN, MAX)), sd = sqrt(var))) +
       xlim(c(MIN, MAX)) +
